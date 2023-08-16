@@ -85,6 +85,25 @@ final class QueryBuilderTest extends TestCase
         $this->assertEquals("SELECT * FROM users ORDER BY id DESC LIMIT 10 OFFSET 0", $q);
     }
 
+        public function testPagination()
+    {
+        $pages = $this->getBuilder()
+            ->from("products")
+            ->limit(10)
+            ->pages($this->getPDO());
+        $this->assertEquals($pages, 1);
+        $pages = $this->getBuilder()
+            ->from("products")
+            ->limit(5)
+            ->pages($this->getPDO());
+        $this->assertEquals($pages, 2);
+        $pages = $this->getBuilder()
+            ->from("products")
+            ->limit(1)
+            ->pages($this->getPDO());
+        $this->assertEquals($pages, 10);
+    }
+
     public function testCondition()
     {
         $q = $this->getBuilder()
@@ -132,6 +151,14 @@ final class QueryBuilderTest extends TestCase
         $this->assertEquals("Ville 1", $city);
     }
 
+    public function testFetchAll()
+    {
+        $city = $this->getBuilder()
+            ->from("products")
+            ->fetchAll($this->getPDO());
+        $this->assertEquals(10, count($city));
+    }
+
     public function testFetchWithInvalidRow()
     {
         $city = $this->getBuilder()
@@ -141,6 +168,7 @@ final class QueryBuilderTest extends TestCase
             ->fetch($this->getPDO(), "city");
         $this->assertNull($city);
     }
+    
     public function testCount()
     {
         $query = $this->getBuilder()
@@ -149,6 +177,9 @@ final class QueryBuilderTest extends TestCase
             ->setParam("name1", "Product 1")
             ->setParam("name2", "Product 2");
         $this->assertEquals(2, $query->count($this->getPDO()));
+        $query = $this->getBuilder()
+            ->from("products");
+        $this->assertEquals(10, $query->count($this->getPDO()));
     }
 
     /**

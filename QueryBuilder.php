@@ -78,13 +78,28 @@ class QueryBuilder {
         return $this;
     }
 
-    
+    public function pages(\PDO $pdo): int
+    {
+        $sql = $pdo->prepare("SELECT id " . $this->from);
+        $sql->execute($this->params);
+        $count = count($sql->fetchAll(\PDO::FETCH_ASSOC));
+        return \ceil($count / $this->limit);
+    }
+
     public function fetch(\PDO $pdo, string $field): ?string
     {
         $query = $pdo->prepare($this->toSql());
         $query->execute($this->params);
         $data = $query->fetch(\PDO::FETCH_ASSOC);
         return $data ? $data[$field] : null;
+    }
+
+    public function fetchAll(\PDO $pdo): array
+    {
+        $query = $pdo->prepare($this->toSql());
+        $query->execute($this->params);
+        $data = $query->fetchAll(\PDO::FETCH_ASSOC);
+        return $data;
     }
     
     public function count(\PDO $pdo): int
