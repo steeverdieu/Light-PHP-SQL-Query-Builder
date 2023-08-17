@@ -1,10 +1,12 @@
 <?php
 
+namespace App\Test;
+
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 final class QueryBuilderTest extends TestCase
 {
-
     public function getBuilder(): \App\QueryBuilder
     {
         return new \App\QueryBuilder();
@@ -85,22 +87,22 @@ final class QueryBuilderTest extends TestCase
         $this->assertEquals("SELECT * FROM users ORDER BY id DESC LIMIT 10 OFFSET 0", $q);
     }
 
-        public function testPagination()
+    public function testPagination()
     {
         $pages = $this->getBuilder()
-            ->from("products")
-            ->limit(10)
-            ->pages($this->getPDO());
+        ->from("products")
+        ->limit(10)
+        ->pages($this->getPDO());
         $this->assertEquals($pages, 1);
         $pages = $this->getBuilder()
-            ->from("products")
-            ->limit(5)
-            ->pages($this->getPDO());
+        ->from("products")
+        ->limit(5)
+        ->pages($this->getPDO());
         $this->assertEquals($pages, 2);
         $pages = $this->getBuilder()
-            ->from("products")
-            ->limit(1)
-            ->pages($this->getPDO());
+        ->from("products")
+        ->limit(1)
+        ->pages($this->getPDO());
         $this->assertEquals($pages, 10);
     }
 
@@ -168,7 +170,7 @@ final class QueryBuilderTest extends TestCase
             ->fetch($this->getPDO(), "city");
         $this->assertNull($city);
     }
-    
+
     public function testCount()
     {
         $query = $this->getBuilder()
@@ -191,5 +193,4 @@ final class QueryBuilderTest extends TestCase
         $this->assertEquals(10, $q->count($this->getPDO()));
         $this->assertEquals("SELECT * FROM products", $q->toSQL());
     }
-
 }

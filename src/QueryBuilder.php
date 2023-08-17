@@ -2,8 +2,8 @@
 
 namespace App;
 
-class QueryBuilder {
-
+class QueryBuilder
+{
     private $fields = ["*"];
 
     private $from;
@@ -20,7 +20,7 @@ class QueryBuilder {
 
     public function select(...$fields): self
     {
-        if($this->fields === ["*"]) {
+        if ($this->fields === ["*"]) {
             $this->fields = [];
         }
         $this->fields = array_merge($this->fields, $this->flatArray($fields));
@@ -30,7 +30,7 @@ class QueryBuilder {
     public function from(string $dbName, ?string $dbAlias = null): self
     {
         $this->from = "FROM $dbName";
-        if($dbAlias) {
+        if ($dbAlias) {
             $this->from .= " $dbAlias";
         }
         return $this;
@@ -62,7 +62,7 @@ class QueryBuilder {
 
     public function orderBy(string $key, string $direction)
     {
-        if(!in_array($direction, ['ASC', 'DESC'])) {
+        if (!in_array($direction, ['ASC', 'DESC'])) {
             $this->orderBy[] = $key;
         } else {
             $this->orderBy[] = "$key $direction";
@@ -72,7 +72,7 @@ class QueryBuilder {
 
     public function page(int $page): self
     {
-        if($this->limit !== null) {
+        if ($this->limit !== null) {
             $this->offset(($page - 1) * $this->limit);
         }
         return $this;
@@ -101,7 +101,7 @@ class QueryBuilder {
         $data = $query->fetchAll(\PDO::FETCH_ASSOC);
         return $data;
     }
-    
+
     public function count(\PDO $pdo): int
     {
         $query = $pdo->prepare($this->toSql());
@@ -113,29 +113,27 @@ class QueryBuilder {
     {
         $fields = implode(', ', $this->fields);
         $sql = "SELECT $fields $this->from";
-        if($this->where) {
+        if ($this->where) {
             $sql .= " $this->where";
         }
-        if($this->orderBy) {
+        if ($this->orderBy) {
             $sql .= " ORDER BY " . implode(", ", $this->orderBy);
         }
-        if($this->limit) {
+        if ($this->limit) {
             $sql .= " LIMIT $this->limit";
         }
-        if($this->offset !== null) {
+        if ($this->offset !== null) {
             $sql .= " OFFSET $this->offset";
         }
         return $sql;
     }
 
-    private function flatArray(Array $arr)
+    private function flatArray(array $arr)
     {
         $flatFields = [];
-        array_walk_recursive($arr, function($a) use (&$flatFields) {
+        array_walk_recursive($arr, function ($a) use (&$flatFields) {
             $flatFields[] = $a;
         });
-
         return $flatFields;
     }
-
 }
